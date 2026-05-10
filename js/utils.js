@@ -61,6 +61,29 @@ const debounce = (fn, delay) => {
   };
 };
 
+const calculateJournalStreak = () => {
+  if (!state.journal || state.journal.length === 0) return 0;
+  const journalDates = {};
+  state.journal.forEach(j => {
+    journalDates[j.date] = true;
+  });
+  const today = new Date();
+  let streak = 0;
+  let foundAnyDay = false;
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = MONTHS_SHORT[d.getMonth()] + ' ' + d.getDate();
+    if (journalDates[key]) {
+      foundAnyDay = true;
+      streak++;
+    } else if (foundAnyDay && i > 0) {
+      break;
+    }
+  }
+  return streak;
+};
+
 const calculateStreak = () => {
   if (state.trades.length === 0) return 0;
   const tradeDays = {};

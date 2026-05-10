@@ -18,7 +18,7 @@ function updateGlobalStats(){
   const dispBal = bal > 0 ? '$'+bal.toLocaleString('en',{minimumFractionDigits:0}) : '$0';
   document.getElementById('sb-balance').textContent = dispBal;
   document.getElementById('sb-pnl').textContent=fP(pnl)+' all time';
-  const streak = calculateStreak();
+  const streak = calculateJournalStreak();
   document.getElementById('streak-count').textContent = streak > 0 ? streak : '0';
   document.getElementById('edge-score-chip').textContent = state.trades.length > 0 ? es : '--';
   document.getElementById('dash-balance').textContent='$'+bal.toLocaleString('en',{minimumFractionDigits:2});
