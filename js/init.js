@@ -107,6 +107,7 @@ function updateCurrentDates(){
   const day = today.getDate();
   const year = today.getFullYear();
   
+  document.getElementById('topbar-title').textContent = getGreeting();
   document.getElementById('topbar-sub').textContent = monthName + ' ' + day + ', ' + year + ' · ' + getSession();
   
   const journalHeader = document.querySelector('#page-journal .card-title');

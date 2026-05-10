@@ -11,7 +11,7 @@ function nav(page){
   if(nb)nb.classList.add('active');
   const mb=document.getElementById('mob-'+page);
   if(mb)mb.classList.add('active');
-  const titles={dashboard:'Dashboard',trades:'Trade Log',journal:'Journal',analytics:'Analytics',psychology:'Psychology',plan:'Trade Plan',calendar:'Calendar',settings:'Settings'};
+  const titles={dashboard:getGreeting(),trades:'Trade Log',journal:'Journal',analytics:'Analytics',psychology:'Psychology',plan:'Trade Plan',calendar:'Calendar',settings:'Settings'};
   document.getElementById('topbar-title').textContent=titles[page]||page;
   document.getElementById('main-scroll').scrollTop=0;
   if(page==='analytics')setTimeout(renderAnalyticsCharts,50);

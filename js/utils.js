@@ -61,6 +61,17 @@ const debounce = (fn, delay) => {
   };
 };
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  const name = state.user?.name || 'Trader';
+  const firstName = name.split(' ')[0];
+  let greeting;
+  if (hour < 12) greeting = 'Good morning';
+  else if (hour < 17) greeting = 'Good afternoon';
+  else greeting = 'Good evening';
+  return `${greeting} ${firstName}`;
+};
+
 const calculateJournalStreak = () => {
   if (!state.journal || state.journal.length === 0) return 0;
   const journalDates = {};
