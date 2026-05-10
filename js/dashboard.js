@@ -13,13 +13,15 @@ function renderDashboard(){
 }
 
 function renderEquityChart(){
-  const dates=[...new Set(state.trades.map(t=>t.date))].reverse();
+  if(!state.trades || !state.trades.length) return;
+  const dates=[...new Set(state.trades.map(t=>t.date))].sort();
   let bal = state.startingBalance || 0;
   const labels=[], data=[];
   dates.forEach(d=>{
     const dayPnl=state.trades.filter(t=>t.date===d).reduce((s,t)=>s+t.pnl,0);
     bal+=dayPnl;
-    labels.push(d.replace('Apr ',''));
+    const monthName = new Date(d.replace(/(\w+)\s(\d+)/,'$2 $1 2026')).toLocaleString('en-US',{month:'short'});
+    labels.push(d.replace(/^\w+\s/,''));
     data.push(parseFloat(bal.toFixed(0)));
   });
   const ctx=document.getElementById('equity-chart').getContext('2d');
@@ -38,14 +40,15 @@ function renderEquityChart(){
 }
 
 function renderTeethChart(){
-  const dates=[...new Set(state.trades.map(t=>t.date))].reverse().slice(-14);
+  if(!state.trades || !state.trades.length) return;
+  const dates=[...new Set(state.trades.map(t=>t.date))].sort().slice(-14);
   const el=document.getElementById('teeth-chart');
   el.innerHTML='';
   let total=0;
+  const maxAbs = dates.length > 0 ? Math.max(...dates.map(dd=>Math.abs(state.trades.filter(t=>t.date===dd).reduce((s,t)=>s+(t.pnl||0),0))),1) : 1;
   dates.forEach(d=>{
-    const dayPnl=state.trades.filter(t=>t.date===d).reduce((s,t)=>s+t.pnl,0);
+    const dayPnl=state.trades.filter(t=>t.date===d).reduce((s,t)=>s+(t.pnl||0),0);
     total+=dayPnl;
-    const maxAbs=Math.max(...dates.map(dd=>Math.abs(state.trades.filter(t=>t.date===dd).reduce((s,t)=>s+t.pnl,0))),1);
     const h=Math.max(4,(Math.abs(dayPnl)/maxAbs)*44);
     const tooth=document.createElement('div');
     tooth.className='tooth '+(dayPnl>=0?'tooth-win':'tooth-loss');
@@ -69,7 +72,7 @@ function renderRecentTrades(){
         </div>
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;">${_escapeHtml(t.pair)}</div>
-          <div style="font-size:10px;color:var(--muted);">${t.dir} · ${t.session} · ${t.setup}</div>
+          <div style="font-size:10px;color:var(--muted);">${t.dir} · ${_escapeHtml(t.session)} · ${_escapeHtml(t.setup)}</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;">

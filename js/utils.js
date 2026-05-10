@@ -53,6 +53,14 @@ const edgeScore = () => {
   return Math.round(wr*35+ar*35+ds*30);
 };
 
+const debounce = (fn, delay) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+};
+
 const calculateStreak = () => {
   if (state.trades.length === 0) return 0;
   const tradeDays = {};
@@ -63,13 +71,19 @@ const calculateStreak = () => {
   });
   const today = new Date();
   let streak = 0;
+  let foundAnyDay = false;
   for (let i = 0; i < 365; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
     const key = MONTHS_SHORT[d.getMonth()] + ' ' + d.getDate();
-    if (tradeDays[key] && tradeDays[key].wins > 0) {
-      streak++;
-    } else if (i > 0) {
+    if (tradeDays[key]) {
+      foundAnyDay = true;
+      if (tradeDays[key].wins > 0) {
+        streak++;
+      } else if (i > 0) {
+        break;
+      }
+    } else if (foundAnyDay && i > 0) {
       break;
     }
   }

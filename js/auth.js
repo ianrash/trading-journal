@@ -1,24 +1,5 @@
 // Auth Functions
 
-function testSupabase(){
-  fetch(SUPA_URL + '/rest/v1/users?limit=1', {
-    method: 'GET',
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + SUPA_KEY
-    }
-  })
-  .then(res => res.text())
-  .then(data => {
-    console.log('Supabase test OK:', data.substring(0,100));
-    alert('Supabase OK! Response: ' + data.substring(0,100));
-  })
-  .catch(err => {
-    console.log('Supabase test FAILED:', err);
-    alert('Supabase FAILED: ' + err);
-  });
-}
-
 function switchAuthTab(tab){
   document.getElementById('tab-login').classList.toggle('active',tab==='login');
   document.getElementById('tab-signup').classList.toggle('active',tab==='signup');

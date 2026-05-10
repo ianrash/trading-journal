@@ -13,7 +13,7 @@ function renderChecklist(){
     el.innerHTML+=`
     <div class="check-row" onclick="toggleCheck(${c.id})">
       <div class="check-box ${c.done?'done':''}">${c.done?'<svg width="11" height="11" fill="none" stroke="var(--green)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-      <span class="check-label ${c.done?'done':''}">${c.text}</span>
+      <span class="check-label ${c.done?'done':''}">${_escapeHtml(c.text)}</span>
     </div>`;
   });
   const done=state.checklist.filter(c=>c.done).length;
@@ -34,7 +34,7 @@ function renderRules(){
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin-bottom:8px;">
       <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-top:1px;min-width:16px;">${i+1}.</span>
       <div style="flex:1;">
-        <div style="font-size:12px;color:var(--text);line-height:1.5;">${r.text}</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.5;">${_escapeHtml(r.text)}</div>
         <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
           <span class="badge" style="background:${CAT_COLORS[r.category]||'#7968F2'}22;color:${CAT_COLORS[r.category]||'#7968F2'};border-color:${CAT_COLORS[r.category]||'#7968F2'}44;">${r.category}</span>
           ${r.violations>0?`<span style="font-size:10px;color:var(--amber);">${r.violations} violation${r.violations>1?'s':''}</span>`:''}

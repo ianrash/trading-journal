@@ -13,6 +13,8 @@ function buildSetupFilters(){
   });
 }
 
+const debouncedRenderTradeLog = debounce(() => renderTradeLog(), 300);
+
 function setFilter(type,val,btn){
   state.tradeFilter[type]=val;
   if(type==='outcome'){
@@ -31,7 +33,7 @@ function renderTradeLog(){
   const filtered=state.trades.filter(t=>{
     const matchO=outcome==='ALL'||t.outcome===outcome;
     const matchS=setup==='ALL'||t.setup===setup;
-    const matchQ=!q||t.pair.toLowerCase().includes(q)||t.setup.toLowerCase().includes(q)||t.notes.toLowerCase().includes(q);
+    const matchQ=!q||(t.pair && t.pair.toLowerCase().includes(q))||(t.setup && t.setup.toLowerCase().includes(q))||(t.notes && t.notes.toLowerCase().includes(q));
     return matchO&&matchS&&matchQ;
   });
   document.getElementById('trade-count-label').textContent=filtered.length+' of '+state.trades.length+' trades';
@@ -47,8 +49,8 @@ function renderTradeLog(){
         </div>
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span class="trade-pair">${t.pair}</span>
-            <span class="badge badge-accent">${t.setup}</span>
+            <span class="trade-pair">${_escapeHtml(t.pair)}</span>
+            <span class="badge badge-accent">${_escapeHtml(t.setup)}</span>
             ${t.tags&&t.tags.length?`<span style="display:flex;gap:3px;">${t.tags.map(tag=>`<span class="trade-tag trade-tag-${tag.replace(' ','')}">${tag}</span>`).join('')}</span>`:''}
             ${ssCount>0?`<span class="badge badge-muted">📸${ssCount}</span>`:''}
           </div>
@@ -74,9 +76,9 @@ function renderTradeLog(){
         ${ssCount>0?`
         <div style="font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Screenshots</div>
         <div style="display:flex;gap:8px;">
-          ${t.screenshots.htf?`<div><div class="screenshot-thumb"><img src="${t.screenshots.htf}" alt="HTF"/></div><div class="screenshot-label">HTF</div></div>`:''}
-          ${t.screenshots.mtf?`<div><div class="screenshot-thumb"><img src="${t.screenshots.mtf}" alt="MTF"/></div><div class="screenshot-label">MTF</div></div>`:''}
-          ${t.screenshots.ltf?`<div><div class="screenshot-thumb"><img src="${t.screenshots.ltf}" alt="LTF"/></div><div class="screenshot-label">LTF</div></div>`:''}
+          ${t.screenshots?.htf?`<div><div class="screenshot-thumb"><img src="${t.screenshots.htf}" alt="HTF"/></div><div class="screenshot-label">HTF</div></div>`:''}
+          ${t.screenshots?.mtf?`<div><div class="screenshot-thumb"><img src="${t.screenshots.mtf}" alt="MTF"/></div><div class="screenshot-label">MTF</div></div>`:''}
+          ${t.screenshots?.ltf?`<div><div class="screenshot-thumb"><img src="${t.screenshots.ltf}" alt="LTF"/></div><div class="screenshot-label">LTF</div></div>`:''}
         </div>`:''}
       </div>
     </div>`;
