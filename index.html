@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>EdgeVault — Trading Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OFFLINE BANNER
+ ═════════════════════════════════════════════════════════════ -->
+<div id="offline-banner">⚠️ Offline mode — data saved locally, syncs when connected</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AUTH SCREEN
+ ═════════════════════════════════════════════════════════════ -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-logo">
+    <div class="auth-logo-icon">EV</div>
+    <div>
+      <div class="auth-logo-text">EdgeVault</div>
+      <div style="font-size:11px;color:var(--muted);">Trading Journal</div>
+    </div>
+  </div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Log In</button>
+      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <div id="auth-login">
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" id="login-email" placeholder="trader@example.com"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="login-pass" placeholder="••••••••"/>
+      </div>
+      <button class="btn-primary" id="auth-login-btn" onclick="doLogin()">Log In to EdgeVault</button>
+      <div id="auth-error" style="color:var(--red);font-size:12px;text-align:center;margin-top:8px;display:none;padding:0 4px;"></div>
+    </div>
+    <div id="auth-signup" style="display:none;">
+      <div class="field-group">
+        <label class="field-label">Full Name</label>
+        <input class="field-input" type="text" id="signup-name" placeholder="Your name"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" id="signup-email" placeholder="trader@example.com"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input class="field-input" type="password" id="signup-pass" placeholder="Min 8 characters"/>
+      </div>
+      <button class="btn-primary" id="auth-signup-btn" onclick="doSignup()">Create Free Account</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ONBOARDING SCREEN
+═════════════════════════════════════════════════════════════ -->
+<div id="screen-onboard" class="screen">
+  <div class="onboard-progress">
+    <div class="onboard-dot done" id="ob-dot-0"></div>
+    <div class="onboard-dot" id="ob-dot-1"></div>
+    <div class="onboard-dot" id="ob-dot-2"></div>
+    <div class="onboard-dot" id="ob-dot-3"></div>
+  </div>
+  <div class="onboard-content">
+    <div class="onboard-step active" id="ob-step-0">
+      <div class="onboard-icon" style="background:var(--accent-lo);border-color:rgba(121,104,242,0.3);color:var(--accent);">⚡</div>
+      <div class="onboard-title" style="color:var(--text);">Welcome to <span style="color:var(--accent);">EdgeVault</span></div>
+      <div class="onboard-sub">Your professional trading journal. Track every trade, understand your edge, and become a consistently profitable trader.</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;background:var(--green-lo);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📊</div>
+          <div><div style="font-size:13px;font-weight:600;">Real-time analytics</div><div style="font-size:11px;color:var(--muted);">See your edge broken down by setup, pair, session</div></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;background:var(--accent-lo);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🧠</div>
+          <div><div style="font-size:13px;font-weight:600;">Psychology tracking</div><div style="font-size:11px;color:var(--muted);">Discipline score, emotion analysis, revenge trade detection</div></div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;background:var(--amber-lo);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">🏆</div>
+          <div><div style="font-size:13px;font-weight:600;">Edge Score system</div><div style="font-size:11px;color:var(--muted);">A single score that measures your overall trading health</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="onboard-step" id="ob-step-1">
+      <div class="onboard-icon" style="background:var(--amber-lo);border-color:rgba(245,162,20,0.3);">🎯</div>
+      <div class="onboard-title">What kind of trader are you?</div>
+      <div class="onboard-sub">We'll customise your journal experience for your specific journey.</div>
+      <div class="choose-grid">
+        <div class="choose-card selected" onclick="selectTraderType(this)" data-type="beginner">
+          <div class="choose-card-icon">🌱</div>
+          <div class="choose-card-label">Learning Trader</div>
+          <div class="choose-card-sub">Building my edge</div>
+        </div>
+        <div class="choose-card" onclick="selectTraderType(this)" data-type="prop">
+          <div class="choose-card-icon">⚡</div>
+          <div class="choose-card-label">Prop Firm</div>
+          <div class="choose-card-sub">Challenge / Funded</div>
+        </div>
+        <div class="choose-card" onclick="selectTraderType(this)" data-type="advanced">
+          <div class="choose-card-icon">💎</div>
+          <div class="choose-card-label">Advanced</div>
+          <div class="choose-card-sub">Trading full-time</div>
+        </div>
+        <div class="choose-card" onclick="selectTraderType(this)" data-type="systematic">
+          <div class="choose-card-icon">🤖</div>
+          <div class="choose-card-label">Systematic</div>
+          <div class="choose-card-sub">Algo / Semi-algo</div>
+        </div>
+      </div>
+    </div>
+    <div class="onboard-step" id="ob-step-2">
+      <div class="onboard-icon" style="background:var(--green-lo);border-color:rgba(0,190,116,0.3);">💰</div>
+      <div class="onboard-title">Set up your account</div>
+      <div class="onboard-sub">Tell us about the account you'll be trading with. You can add more accounts later.</div>
+      <div style="flex:1;">
+        <div class="field-group">
+          <label class="field-label">Account Name</label>
+          <input class="field-input" id="ob-acct-name" placeholder="e.g. FTMO $100K Challenge" value="My Live Account"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" class="field-group">
+          <div>
+            <label class="field-label">Starting Balance</label>
+            <input class="field-input" id="ob-balance" type="number" placeholder="10000" value="10000"/>
+          </div>
+          <div>
+            <label class="field-label">Currency</label>
+            <select class="field-input" id="ob-currency">
+              <option>USD</option><option>EUR</option><option>GBP</option><option>UGX</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label class="field-label">Max Risk Per Trade (%)</label>
+            <input class="field-input" id="ob-risk" type="number" step="0.1" value="1.0"/>
+          </div>
+          <div>
+            <label class="field-label">Daily Loss Limit (%)</label>
+            <input class="field-input" id="ob-daily-loss" type="number" step="0.1" value="3.0"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="onboard-step" id="ob-step-3">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <div style="width:80px;height:80px;background:linear-gradient(135deg,#7968F2,#A855F7);border-radius:24px;
+          display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:24px;
+          box-shadow:0 0 48px rgba(121,104,242,0.4);">⚡</div>
+        <div class="onboard-title" style="font-size:30px;">You're ready.</div>
+        <div class="onboard-sub">Your vault is set up. Start logging trades, building your journal, and discovering your edge.</div>
+        <div id="ob-user-name-display" style="background:var(--card);border:1px solid var(--border);border-radius:14px;
+          padding:16px 24px;margin-top:16px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">ACCOUNT LOADED</div>
+          <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--green);">$10,000.00</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="ob-acct-confirm">My Live Account · USD</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="onboard-footer">
+    <button class="btn-secondary" id="ob-back-btn" onclick="obBack()" style="display:none;">Back</button>
+    <button class="btn-next" id="ob-next-btn" onclick="obNext()">Get Started →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN APP SCREEN
+═════════════════════════════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">EV</div>
+      <div>
+        <div class="sidebar-logo-name">EdgeVault</div>
+        <div class="sidebar-logo-tagline">Trading Journal</div>
+      </div>
+    </div>
+    <div class="account-pill">
+      <div class="account-pill-label">Live Account</div>
+      <div class="account-pill-bal mono" id="sb-balance">$0</div>
+      <div class="account-pill-pnl" id="sb-pnl">+$0 all time</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-btn active" onclick="nav('dashboard')" id="nav-dashboard">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-btn" onclick="nav('trades')" id="nav-trades">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Trade Log
+      </button>
+      <button class="nav-btn" onclick="nav('journal')" id="nav-journal">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Journal
+      </button>
+      <button class="nav-btn" onclick="nav('analytics')" id="nav-analytics">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </button>
+      <button class="nav-btn" onclick="nav('psychology')" id="nav-psychology">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="12" r="10"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Psychology
+        <span class="nav-dot" id="psych-dot" style="display:none;"></span>
+      </button>
+      <button class="nav-btn" onclick="nav('plan')" id="nav-plan">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Trade Plan
+      </button>
+      <button class="nav-btn" onclick="nav('calendar')" id="nav-calendar">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendar
+      </button>
+      <button class="nav-btn" onclick="nav('settings')" id="nav-settings">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </nav>
+  </aside>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Apr 17, 2026 · New York Open</div>
+      </div>
+      <div class="topbar-chips">
+        <div class="chip chip-amber">🔥 <span class="chip-val" id="streak-count">0</span> <span>streak</span></div>
+        <div class="chip chip-accent">⚡ <span class="chip-val" id="edge-score-chip">--</span> <span>edge</span></div>
+        <button class="chip" onclick="openProfile()" style="cursor:pointer;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="topbar-username">Trader</span>
+        </button>
+      </div>
+    </header>
+    <main class="main-scroll" id="main-scroll">
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page active" id="page-dashboard">
+        <div style="background:linear-gradient(135deg,var(--card) 0%,#0E0E22 100%);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div style="font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Account Balance</div>
+              <div class="mono" style="font-size:24px;font-weight:500;line-height:1.2;" id="dash-balance">$0</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                <span class="mono" style="font-size:14px;font-weight:600;" id="dash-pnl-display">+$0</span>
+                <span class="badge badge-green" id="dash-pnl-pct">+0.0%</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                🔥 <span style="color:var(--amber);font-family:'DM Mono',monospace;font-size:14px;font-weight:700;" id="dash-streak">0-day streak</span>
+              </div>
+              <div style="background:var(--accent-lo);border:1px solid rgba(121,104,242,0.3);border-radius:10px;padding:8px 16px;text-align:center;">
+                <div style="font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;">Edge Score</div>
+                <div class="mono" style="font-size:28px;font-weight:700;color:var(--accent);line-height:1.1;" id="dash-edge-score">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-grid" style="margin-bottom:12px;">
+          <div class="stat-card">
+            <div class="stat-label">Win Rate</div>
+            <div class="stat-val" id="stat-winrate" style="color:var(--green);">0%</div>
+            <div class="stat-sub" id="stat-wl">0W / 0L</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg R</div>
+            <div class="stat-val" id="stat-avgr" style="color:var(--text);">0.0R</div>
+            <div class="stat-sub">per trade</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Expectancy</div>
+            <div class="stat-val" id="stat-exp" style="color:var(--accent);">0.0R</div>
+            <div class="stat-sub">per trade</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Profit Factor</div>
+            <div class="stat-val" id="stat-pf" style="color:var(--text);">0.0</div>
+            <div class="stat-sub">gross ratio</div>
+          </div>
+        </div>
+
+        <div class="pnl-card" style="margin-bottom:12px;">
+          <div class="pnl-top">
+            <div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Daily P&L — Last 14 Days</div>
+              <div class="pnl-amount" id="teeth-total" style="color:var(--green);">+$0</div>
+            </div>
+            <span class="badge badge-accent" id="teeth-trades-count">0 trades</span>
+          </div>
+          <div class="teeth-chart" id="teeth-chart"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span class="card-title" style="margin:0;">Equity Curve</span>
+            <span class="badge badge-accent" id="eq-trade-count">0 trades</span>
+          </div>
+          <div class="equity-wrap"><canvas id="equity-chart"></canvas></div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span class="card-title" style="margin:0;">Recent Trades</span>
+            <button onclick="nav('trades')" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">
+              View all <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div id="recent-trades-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Session Performance</div>
+          <div id="session-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- TRADE LOG PAGE -->
+      <div class="page" id="page-trades">
+        <div class="card" style="margin-bottom:12px;padding:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Account Balance</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="mono" style="font-size:20px;font-weight:700;color:var(--green);" id="trades-balance">$0</span>
+                <button onclick="showBalanceModal()" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;">✎ Edit</button>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">P&L</div>
+              <span class="mono" style="font-size:16px;font-weight:600;" id="trades-pnl">$0</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;">
+          <div class="search-bar" style="flex:1;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input placeholder="Search pair, setup..." id="trade-search" oninput="renderTradeLog()"/>
+          </div>
+          <button class="sidebar-add-btn" style="width:auto;padding:8px 16px;" onclick="openAddTrade()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Trade
+          </button>
+        </div>
+        <div class="filter-row" id="outcome-filters">
+          <button class="filter-btn active-all" onclick="setFilter('outcome','ALL',this)" data-outcome="ALL">ALL</button>
+          <button class="filter-btn" onclick="setFilter('outcome','WIN',this)" data-outcome="WIN">WIN</button>
+          <button class="filter-btn" onclick="setFilter('outcome','LOSS',this)" data-outcome="LOSS">LOSS</button>
+          <button class="filter-btn" onclick="setFilter('outcome','BE',this)" data-outcome="BE">BREAKEVEN</button>
+        </div>
+        <div class="filter-row" id="setup-filters"></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;" id="trade-count-label"></div>
+        <div id="trade-list"></div>
+      </div>
+
+      <!-- JOURNAL PAGE -->
+      <div class="page" id="page-journal">
+        <div class="card" style="margin-bottom:12px;background:linear-gradient(135deg,var(--accent-lo) 0%,var(--card) 100%);border-color:rgba(121,104,242,0.3);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span class="card-title" style="margin:0;color:var(--accent);">Daily Prompt</span>
+            <button class="badge" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;" onclick="newPrompt()">↻ New</button>
+          </div>
+          <div id="daily-prompt" style="font-size:16px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:12px;">What's your bias for today?</div>
+          <textarea class="form-textarea" id="prompt-answer" placeholder="Write your thoughts..." style="min-height:60px;"></textarea>
+          <button class="modal-save" onclick="savePromptAnswer()" style="margin-top:10px;padding:8px 16px;font-size:12px;">Save Answer</button>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div><div class="card-title" style="margin:0;">Today's Entry</div><div style="font-size:11px;color:var(--muted);">Apr 17, 2026</div></div>
+            <span class="badge badge-amber">Draft</span>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Mental State</label>
+            <div class="emotion-grid" id="journal-emotion-grid"></div>
+          </div>
+          <div class="field-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+              <label class="field-label" style="margin:0;">Mood Score</label>
+              <span class="mono" style="font-size:16px;font-weight:700;" id="mood-display">7/10</span>
+            </div>
+            <input type="range" min="1" max="10" value="7" id="mood-slider" oninput="updateMoodDisplay(this.value)"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Session Reflection</label>
+            <textarea class="form-textarea" id="journal-entry-text" placeholder="How did today's session go? What happened? How did you feel trading?" style="min-height:100px;"></textarea>
+          </div>
+          <div class="field-group" style="margin-bottom:0;">
+            <label class="field-label">Lesson Learned</label>
+            <textarea class="form-textarea" id="journal-lesson-text" placeholder="What is the one thing you're taking from today?" rows="2" style="min-height:60px;"></textarea>
+          </div>
+          <button class="modal-save" onclick="saveJournalEntry()" style="margin-top:14px;">Save Entry</button>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;">Past Entries</div>
+        <div id="journal-list"></div>
+      </div>
+
+      <!-- ANALYTICS PAGE -->
+      <div class="page" id="page-analytics">
+        <div class="stat-grid" style="margin-bottom:12px;">
+          <div class="stat-card">
+            <div class="stat-label">Total P&L</div>
+            <div class="stat-val mono" id="an-pnl" style="color:var(--green);">$0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Win Rate</div>
+            <div class="stat-val mono" id="an-wr">0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg Win R</div>
+            <div class="stat-val mono" id="an-awr">0R</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg Loss R</div>
+            <div class="stat-val mono" id="an-alr">0R</div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">Win Rate by Setup</div>
+          <div style="height:180px;"><canvas id="setup-chart"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">P&L by Pair</div>
+          <div style="height:180px;"><canvas id="pair-chart"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">Emotion vs Win Rate</div>
+          <div style="height:160px;"><canvas id="emotion-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Setup Detail Matrix</div>
+          <div style="overflow-x:auto;"><table id="setup-matrix" style="width:100%;border-collapse:collapse;font-size:12px;"></table></div>
+        </div>
+      </div>
+
+      <!-- PSYCHOLOGY PAGE -->
+      <div class="page" id="page-psychology">
+        <div class="discipline-hero">
+          <div style="font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;">Discipline Score</div>
+          <div class="disc-score" id="disc-score-big">--</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">out of 100</div>
+          <div class="disc-bar-wrap"><div class="disc-bar" id="disc-bar" style="width:0;background:var(--green);"></div></div>
+          <div style="font-size:12px;color:var(--muted);" id="disc-viol-count">0 violations this period</div>
+        </div>
+        <div class="stat-grid" style="margin-bottom:12px;">
+          <div class="stat-card"><div class="stat-label">Violations</div><div class="stat-val mono" id="psych-violations">0</div></div>
+          <div class="stat-card"><div class="stat-label">Revenge Trades</div><div class="stat-val mono" style="color:var(--red);" id="psych-revenge">0</div></div>
+          <div class="stat-card"><div class="stat-label">Calm Sessions</div><div class="stat-val mono" style="color:var(--green);" id="psych-calm">0</div></div>
+          <div class="stat-card"><div class="stat-label">FOMO Trades</div><div class="stat-val mono" style="color:var(--amber);" id="psych-fomo">0</div></div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">Rule Violations</div>
+          <div id="rule-violations-list"></div>
+        </div>
+      </div>
+
+      <!-- TRADE PLAN PAGE -->
+      <div class="page" id="page-plan">
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">Risk Calculator</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div class="field-group" style="margin:0;">
+              <label class="field-label">Account Balance ($)</label>
+              <input class="field-input" id="calc-balance" type="number" value="10000" oninput="calcRisk()"/>
+            </div>
+            <div class="field-group" style="margin:0;">
+              <label class="field-label">Risk %</label>
+              <input class="field-input" id="calc-risk-pct" type="number" step="0.1" value="1.0" oninput="calcRisk()"/>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div class="field-group" style="margin:0;">
+              <label class="field-label">Entry Price</label>
+              <input class="field-input mono" id="calc-entry" type="number" step="any" placeholder="0.00" oninput="calcRisk()"/>
+            </div>
+            <div class="field-group" style="margin:0;">
+              <label class="field-label">Stop Loss</label>
+              <input class="field-input mono" id="calc-sl" type="number" step="any" placeholder="0.00" oninput="calcRisk()"/>
+            </div>
+          </div>
+          <div id="calc-result" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Position Size</div>
+            <div class="mono" style="font-size:28px;font-weight:700;color:var(--accent);" id="calc-lots">--</div>
+            <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;">
+              <span style="color:var(--muted);">Risk Amount: <span class="mono" id="calc-risk-amt" style="color:var(--red);">$100</span></span>
+              <span style="color:var(--muted);">SL Pips: <span class="mono" id="calc-pips" style="color:var(--text);">--</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">My Trading Rules</div>
+          <div id="rules-list"></div>
+          <div class="rule-input-row">
+            <input class="rule-input" id="new-rule-input" placeholder="Add a new rule..." onkeydown="if(event.key==='Enter')addRule()"/>
+            <button class="rule-add-btn" onclick="addRule()">Add</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Monthly Goals — April 2026</div>
+          <div id="goals-list"></div>
+        </div>
+      </div>
+
+      <!-- CALENDAR PAGE -->
+      <div class="page" id="page-calendar">
+        <div class="cal-container">
+          <!-- Header -->
+          <div class="cal-header">
+            <div class="cal-nav-btns">
+              <button class="cal-nav-btn" onclick="calPrev()">←</button>
+              <button class="cal-nav-btn" onclick="calNext()">→</button>
+              <h2 class="cal-title" id="cal-month-year">May 2026</h2>
+            </div>
+            <div class="cal-dot"></div>
+          </div>
+
+          <!-- Week Days -->
+          <div class="cal-weekdays">
+            <div class="cal-weekday">Sun</div>
+            <div class="cal-weekday">Mon</div>
+            <div class="cal-weekday">Tue</div>
+            <div class="cal-weekday">Wed</div>
+            <div class="cal-weekday">Thu</div>
+            <div class="cal-weekday">Fri</div>
+            <div class="cal-weekday">Sat</div>
+          </div>
+
+          <!-- Calendar Grid -->
+          <div id="cal-grid" class="cal-grid"></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="page" id="page-settings">
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">Account Settings</div>
+          <div class="field-group">
+            <label class="field-label">Account Name</label>
+            <input class="field-input" id="settings-account-name" placeholder="My Live Account" oninput="saveSettings()"/>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Starting Balance ($)</label>
+            <input class="field-input mono" id="settings-balance" type="number" placeholder="10000" oninput="saveSettings()"/>
+          </div>
+          <div class="field-group" style="margin-bottom:0;">
+            <label class="field-label">Currency</label>
+            <select class="field-input" id="settings-currency" onchange="saveSettings()">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+              <option value="UGX">UGX</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-title">Profile</div>
+          <div class="field-group">
+            <label class="field-label">Your Name</label>
+            <input class="field-input" id="settings-name" placeholder="Trader" oninput="saveSettings()"/>
+          </div>
+          <div class="field-group" style="margin-bottom:0;">
+            <label class="field-label">Email</label>
+            <input class="field-input" id="settings-email" type="email" placeholder="trader@example.com" oninput="saveSettings()"/>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">Risk Settings</div>
+          <div class="field-group">
+            <label class="field-label">Default Risk Per Trade (%)</label>
+            <input class="field-input mono" id="settings-risk" type="number" step="0.1" value="1.0" oninput="saveSettings()"/>
+          </div>
+          <div class="field-group" style="margin-bottom:0;">
+            <label class="field-label">Daily Loss Limit (%)</label>
+            <input class="field-input mono" id="settings-daily-loss" type="number" step="0.1" value="3.0" oninput="saveSettings()"/>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROFILE PANEL
+═════════════════════════════════════════════════════════════ -->
+<div class="profile-overlay" id="profile-overlay" onclick="closeProfile()"></div>
+<div class="profile-panel" id="profile-panel">
+  <div class="profile-header">
+    <div class="profile-avatar" id="profile-avatar" style="cursor:pointer;" onclick="document.getElementById('profile-pic-input').click()">
+      <img id="profile-pic-img" src="" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:none;"/>
+    </div>
+    <input type="file" id="profile-pic-input" accept="image/*" style="display:none;" onchange="handleProfilePic(event)"/>
+    <div class="profile-name" id="profile-name">Trader</div>
+    <div class="profile-email" id="profile-email">trader@edgevault.app</div>
+  </div>
+  <div class="profile-body">
+    <div class="profile-section-title">Performance This Month</div>
+    <div class="profile-stat-row">
+      <span class="profile-stat-label">Total Trades</span>
+      <span class="profile-stat-val mono" id="pr-total">0</span>
+    </div>
+    <div class="profile-stat-row">
+      <span class="profile-stat-label">Total P&L</span>
+      <span class="profile-stat-val mono" id="pr-pnl" style="color:var(--green);">+$0</span>
+    </div>
+    <div class="profile-stat-row">
+      <span class="profile-stat-label">Win Rate</span>
+      <span class="profile-stat-val mono" id="pr-wr">0%</span>
+    </div>
+    <div class="profile-stat-row">
+      <span class="profile-stat-label">Edge Score</span>
+      <span class="profile-stat-val mono" style="color:var(--accent);" id="pr-edge">--</span>
+    </div>
+    <div class="profile-stat-row">
+      <span class="profile-stat-label">Journal Streak</span>
+      <span class="profile-stat-val mono" style="color:var(--amber);">🔥 <span id="pr-streak">0</span> days</span>
+    </div>
+    <div class="profile-section-title">Account</div>
+    <div class="profile-menu-item" onclick="alert('Export coming in V2')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Data
+    </div>
+    <div class="profile-menu-item danger" onclick="doLogout()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Log Out
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MOBILE NAV
+═════════════════════════════════════════════════════════════ -->
+<nav class="mobile-nav">
+  <button class="mob-btn active" onclick="nav('dashboard')" id="mob-dashboard">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="mob-btn" onclick="nav('trades')" id="mob-trades">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>Trades</span>
+  </button>
+  <button class="mob-btn" onclick="nav('calendar')" id="mob-calendar">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Calendar</span>
+  </button>
+  <button class="mob-btn" onclick="nav('journal')" id="mob-journal">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>Journal</span>
+  </button>
+  <button class="mob-btn" onclick="nav('analytics')" id="mob-analytics">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Stats</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADD TRADE MODAL
+═════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="add-trade-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Log Trade</div>
+        <div class="modal-sub">Fill in your trade details</div>
+      </div>
+      <button class="modal-close" onclick="closeAddTrade()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row form-2" style="margin-bottom:14px;">
+        <div class="form-field">
+          <label class="field-label">Pair</label>
+          <select class="form-select" id="f-pair">
+            <option>EUR/USD</option><option>GBP/USD</option><option>XAU/USD</option>
+            <option>USD/JPY</option><option>BTC/USD</option><option>GBP/JPY</option>
+            <option>NAS100</option><option>US30</option><option>ETH/USD</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Direction</label>
+          <div class="dir-toggle">
+            <button class="dir-btn dir-btn-buy active" id="btn-buy" onclick="setDir('BUY')">▲ BUY</button>
+            <button class="dir-btn dir-btn-sell" id="btn-sell" onclick="setDir('SELL')">▼ SELL</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:4px;"><label class="field-label">Outcome</label></div>
+      <div class="outcome-toggle" id="outcome-toggle">
+        <button class="outcome-btn outcome-btn-win active" id="out-WIN" onclick="setOutcome('WIN')">✓ WIN</button>
+        <button class="outcome-btn outcome-btn-loss" id="out-LOSS" onclick="setOutcome('LOSS')">✗ LOSS</button>
+        <button class="outcome-btn outcome-btn-be" id="out-BE" onclick="setOutcome('BE')">= BREAK EVEN</button>
+      </div>
+
+      <div class="form-row form-3" style="margin-bottom:14px;">
+        <div class="form-field">
+          <label class="field-label">Entry Price</label>
+          <input class="form-input mono" id="f-entry" type="number" step="any" placeholder="0.00" oninput="calcLive()"/>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Stop Loss</label>
+          <input class="form-input mono" id="f-sl" type="number" step="any" placeholder="0.00" oninput="calcLive()"/>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Take Profit</label>
+          <input class="form-input mono" id="f-tp" type="number" step="any" placeholder="0.00" oninput="calcLive()"/>
+        </div>
+      </div>
+
+      <div class="calc-pill" id="calc-pill" style="display:none;">
+        <div class="calc-item"><div class="calc-item-label">R Potential</div><div class="calc-item-val" id="calc-r" style="color:var(--green);">--</div></div>
+        <div class="calc-item"><div class="calc-item-label">Est. Win $</div><div class="calc-item-val" id="calc-win" style="color:var(--green);">--</div></div>
+        <div class="calc-item"><div class="calc-item-label">Risk $</div><div class="calc-item-val" id="calc-risk" style="color:var(--text);">--</div></div>
+      </div>
+
+      <div class="form-row form-3" style="margin-bottom:14px;">
+        <div class="form-field">
+          <label class="field-label">Risk %</label>
+          <input class="form-input mono" id="f-risk" type="number" step="0.1" value="1.0" oninput="calcLive()"/>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Session</label>
+          <select class="form-select" id="f-session">
+            <option>London</option><option>New York</option><option>Overlap</option><option>Asian</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Setup</label>
+          <select class="form-select" id="f-setup">
+            <option>FVG Fill</option><option>OB Tap</option><option>MSS Entry</option>
+            <option>BOS Retest</option><option>Range Break</option><option>Liq. Sweep</option>
+            <option>CHOCH</option><option>Scalp</option><option>Swing</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row form-2" style="margin-bottom:14px;">
+        <div class="form-field">
+          <label class="field-label">Date</label>
+          <input class="form-input mono" id="f-date" type="date"/>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Actual P&L ($)</label>
+          <input class="form-input mono" id="f-pnl" type="number" step="any" placeholder="e.g. 145 or -80" oninput="calcLive()"/>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Actual R</label>
+          <input class="form-input mono" id="f-r" type="number" step="any" placeholder="e.g. 2.0 or -1.0"/>
+        </div>
+      </div>
+
+      <div class="ss-section">
+        <div class="ss-label">Chart Screenshots</div>
+        <div class="ss-frames">
+          <div>
+            <div class="ss-frame" id="ss-htf" onclick="triggerSSUpload('htf')">
+              <button class="ss-remove" onclick="event.stopPropagation();clearSS('htf')">✕</button>
+              <div class="ss-frame-overlay">
+                <div class="ss-frame-icon">📸</div>
+              </div>
+            </div>
+            <div class="ss-frame-label">HTF</div>
+          </div>
+          <div>
+            <div class="ss-frame" id="ss-mtf" onclick="triggerSSUpload('mtf')">
+              <button class="ss-remove" onclick="event.stopPropagation();clearSS('mtf')">✕</button>
+              <div class="ss-frame-overlay">
+                <div class="ss-frame-icon">📸</div>
+              </div>
+            </div>
+            <div class="ss-frame-label">MTF</div>
+          </div>
+          <div>
+            <div class="ss-frame" id="ss-ltf" onclick="triggerSSUpload('ltf')">
+              <button class="ss-remove" onclick="event.stopPropagation();clearSS('ltf')">✕</button>
+              <div class="ss-frame-overlay">
+                <div class="ss-frame-icon">📸</div>
+              </div>
+            </div>
+            <div class="ss-frame-label">LTF</div>
+          </div>
+        </div>
+        <input type="file" id="ss-file-input" accept="image/*" style="display:none;" onchange="handleSSUpload(event)"/>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label class="field-label">Pre-Trade Emotion</label>
+        <div class="emotion-grid" id="modal-emotion-grid"></div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label class="field-label">Self Rating</label>
+        <div class="star-row" id="star-row">
+          <span class="star-btn active" data-n="1" onclick="setRating(1)">★</span>
+          <span class="star-btn active" data-n="2" onclick="setRating(2)">★</span>
+          <span class="star-btn active" data-n="3" onclick="setRating(3)">★</span>
+          <span class="star-btn active" data-n="4" onclick="setRating(4)">★</span>
+          <span class="star-btn" data-n="5" onclick="setRating(5)">★</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label class="field-label">Trade Tags</label>
+        <div class="trade-tags" id="trade-tags">
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Revenge')">Revenge</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'FOMO')">FOMO</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Patience')">Patience</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Best Trade')">Best Trade</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Quick Trade')">Quick Trade</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Scalp')">Scalp</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Swing')">Swing</button>
+          <button class="trade-tag-btn" onclick="toggleTag(this,'Late Entry')">Late Entry</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label">Trade Notes</label>
+        <textarea class="form-textarea" id="f-notes" placeholder="Your thesis, confluence factors, what you saw, how the trade played out..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-save" onclick="saveTrade()">Save Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">&#10005;</button>
+  <img class="lightbox-img" id="lightbox-img" src="" alt=""/>
+  <div class="lightbox-label" id="lightbox-label"></div>
+</div>
+
+<!-- CALENDAR TRADE DETAILS MODAL -->
+<div class="modal-overlay" id="cal-details-modal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="cal-details-title">Trades for May 2</div>
+        <div class="modal-sub" id="cal-details-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeCalDetails()">✕</button>
+    </div>
+    <div class="modal-body" id="cal-details-body" style="max-height:400px;overflow-y:auto;">
+    </div>
+  </div>
+</div>
+
+<!-- BALANCE MODAL -->
+<div class="modal-overlay" id="balance-modal">
+  <div class="modal-box" style="max-width:350px;">
+    <div class="modal-header">
+      <div class="modal-title">Set Account Balance</div>
+      <button class="modal-close" onclick="closeBalanceModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group">
+        <label class="field-label">Current Balance</label>
+        <input class="field-input mono" id="balance-input" type="number" placeholder="10000" style="font-size:18px;text-align:center;padding:16px;"/>
+      </div>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px;">This is your starting account balance for P&L calculations.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-save" onclick="saveBalance()">Save Balance</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/supabase.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/trades.js"></script>
+<script src="js/journal.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/psychology.js"></script>
+<script src="js/plan.js"></script>
+<script src="js/modals.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/init.js"></script>
+</body>
+</html>
